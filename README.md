@@ -1,16 +1,96 @@
-# React + Vite
+# PulseCity 🏙️
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> Democratizing civic infrastructure reporting. Citizens report, communities amplify, authorities act.
 
-Currently, two official plugins are available:
+PulseCity transforms how communities report and resolve infrastructure issues. Instead of complaints disappearing into bureaucracy, citizens can post geotagged photos of problems (potholes, broken lights, flooding, etc.), other residents upvote duplicates to amplify the signal, and staff dispatch teams to fix them with full visibility.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**Status**: Open → Verified → Assigned → In Progress → Completed — full transparency every step of the way.
 
-## React Compiler
+## Quick Start
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+See [SETUP.md](./SETUP.md) for complete setup instructions.
 
-## Expanding the ESLint configuration
+```bash
+npm install
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Then open http://localhost:5173 and sign up.
+
+## Core Features
+
+### For Citizens
+- 📸 Report issues with geotagged photos
+- 🗺️ View all reports on an interactive map
+- 👍 Upvote duplicate issues to strengthen signal
+- 📊 Track status of your reports in real-time
+- 💬 Comment and discuss with community
+
+### For Staff/Admins
+- 📋 Dashboard with analytics (issues by category)
+- 🎯 Filter and prioritize issues
+- 🚗 Assign issues to team members
+- 📈 Track team productivity
+- 🔔 Get notified when assigned new work
+
+## Technology Stack
+
+- **React 19** — UI framework
+- **Vite** — Lightning-fast dev server
+- **Google Maps API** — Geotagging & visualization
+- **Supabase** — PostgreSQL + Auth + Storage
+- **Recharts** — Analytics visualizations
+
+## Architecture
+
+```
+Frontend (React + Vite)
+    ↓
+Supabase Auth
+    ↓
+PostgreSQL (issues, votes, comments, notifications)
+    ↓
+Supabase Storage (photos)
+```
+
+### Database Schema
+
+**Key Tables**:
+- `profiles` — user roles (citizen/staff/admin)
+- `issues` — reports with location, photo, status
+- `votes` — upvote/downvote tracking (one per user per issue)
+- `comments` — discussion threads
+- `status_history` — timeline of changes
+- `notifications` — real-time alerts
+
+See [SETUP.md](./SETUP.md#database-schema) for full schema details.
+
+## Deployment
+
+### Vercel (Recommended)
+```bash
+npm run build
+# Deploy dist/ folder to Vercel
+```
+
+### Self-hosted
+```bash
+npm run build
+# Serve dist/ folder with any web server
+```
+
+## Environment Variables
+
+```env
+VITE_GOOGLE_MAPS_API_KEY=your_key_here
+VITE_SUPABASE_URL=your_url_here
+VITE_SUPABASE_ANON_KEY=your_key_here
+```
+
+## Contributing
+
+This project is actively developed. Ideas, bug reports, and PRs welcome!
+
+## License
+
+Open source under MIT.

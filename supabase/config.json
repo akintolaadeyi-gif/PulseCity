@@ -1,0 +1,18 @@
+{
+  "project_id": "rxiuhtqntibvglmtgefh",
+  "db_url": "postgresql://postgres.rxiuhtqntibvglmtgefh:[PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/postgres",
+  "storage_buckets": [
+    {
+      "name": "issue-photos",
+      "public": true,
+      "file_size_limit": 52428800
+    }
+  ],
+  "setup_instructions": {
+    "step_1": "Go to https://supabase.com and create a project",
+    "step_2": "Note your project URL and anon key (already in .env.local)",
+    "step_3": "In Supabase SQL Editor, run the migration file: supabase/migrations/001_init_pulsecity_schema.sql",
+    "step_4": "Create a storage bucket named 'issue-photos' and set it to public",
+    "step_5": "Run: npm run dev"
+  }
+}
