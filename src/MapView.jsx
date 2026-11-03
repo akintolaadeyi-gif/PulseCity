@@ -3,6 +3,10 @@ import * as maplibregl from 'maplibre-gl';
 import { Protocol } from 'pmtiles';
 import { layers, namedFlavor } from '@protomaps/basemaps';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
+
+// Bundlers move MapLibre's files around, so tell it where its worker ended up.
+maplibregl.setWorkerUrl(workerUrl);
 
 // Our own map: a single PMTiles file of Abuja built from OpenStreetMap data,
 // served as a static file with the app. No API key, no third-party map service.
