@@ -1,7 +1,7 @@
 import { GoogleMap, LoadScript, MarkerF } from '@react-google-maps/api';
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import './App.css';
 
 const ABUJA_CENTER = { lat: 9.0765, lng: 7.3986 };
@@ -14,6 +14,15 @@ const CATEGORIES = [
   { id: 'electricity', label: 'Electricity', emoji: '🟣', color: '#9b5de5' },
   { id: 'school', label: 'School', emoji: '⚫', color: '#343a40' },
 ];
+
+// Hide Google's own business, transit and landmark icons so citizen reports stand out.
+const MAP_OPTIONS = {
+  clickableIcons: false,
+  styles: [
+    { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+    { featureType: 'transit', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+  ],
+};
 
 const STATUSES = ['open', 'verified', 'assigned', 'in-progress', 'completed'];
 
@@ -177,6 +186,7 @@ export default function App() {
           const chartData = CATEGORIES.map((cat) => ({
             name: cat.label,
             count: categoryCount[cat.id],
+            color: cat.color,
           }));
           setChartData(chartData);
         }
@@ -521,7 +531,8 @@ export default function App() {
   return (
     <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
       <div className="app">
-        <GoogleMap mapContainerClassName="map" center={ABUJA_CENTER} zoom={13} onClick={handleMapClick}>
+        <div className="map-area">
+        <GoogleMap mapContainerClassName="map" center={ABUJA_CENTER} zoom={13} onClick={handleMapClick} options={MAP_OPTIONS}>
           {issues.map((issue) => (
             <MarkerF
               key={issue.id}
@@ -533,6 +544,15 @@ export default function App() {
           ))}
           {pendingLocation && <MarkerF position={pendingLocation} label="📍" />}
         </GoogleMap>
+          <div className="map-legend" aria-label="Map legend">
+            {CATEGORIES.map((cat) => (
+              <div key={cat.id} className="legend-item">
+                <span className="legend-dot" style={{ background: cat.color }} />
+                {cat.label}
+              </div>
+            ))}
+          </div>
+        </div>
 
         <div className="sidebar">
           <div className="sidebar-header">
@@ -582,13 +602,17 @@ export default function App() {
 
               <div className="analytics-section">
                 <h4>Issues by Category</h4>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
+                <ResponsiveContainer width="100%" height={260}>
+                  <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 12, bottom: 4, left: 4 }}>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                    <XAxis type="number" allowDecimals={false} />
+                    <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 12 }} interval={0} />
                     <Tooltip />
-                    <Bar dataKey="count" fill="#007bff" />
+                    <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                      {chartData.map((entry) => (
+                        <Cell key={entry.name} fill={entry.color} />
+                      ))}
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </div>
