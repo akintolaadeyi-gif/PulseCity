@@ -1,4 +1,4 @@
-import { GoogleMap, LoadScript, MarkerF } from '@react-google-maps/api';
+import MapView from './MapView';
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
@@ -15,14 +15,6 @@ const CATEGORIES = [
   { id: 'school', label: 'School', emoji: '⚫', color: '#343a40' },
 ];
 
-// Hide Google's own business, transit and landmark icons so citizen reports stand out.
-const MAP_OPTIONS = {
-  clickableIcons: false,
-  styles: [
-    { featureType: 'poi', stylers: [{ visibility: 'off' }] },
-    { featureType: 'transit', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
-  ],
-};
 
 const STATUSES = ['open', 'verified', 'assigned', 'in-progress', 'completed'];
 
@@ -35,6 +27,7 @@ const STATUS_LABELS = {
 };
 
 const getCategory = (id) => CATEGORIES.find((c) => c.id === id);
+const getPinColor = (id) => getCategory(id)?.color || '#777777';
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -300,9 +293,9 @@ export default function App() {
     return data?.publicUrl;
   };
 
-  const handleMapClick = (e) => {
+  const handleMapClick = (location) => {
     if (!isReporting || !selectedCategory) return;
-    setPendingLocation({ lat: e.latLng.lat(), lng: e.latLng.lng() });
+    setPendingLocation(location);
   };
 
   const handleStartReport = () => {
@@ -461,23 +454,6 @@ export default function App() {
     setNotifications((prev) => prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n)));
   };
 
-  const getMarkerIcon = (categoryId) => {
-    if (!window.google?.maps) return undefined;
-    try {
-      const cat = getCategory(categoryId);
-      const color = cat?.color || '#777777';
-      return {
-        path: window.google.maps.SymbolPath.CIRCLE,
-        scale: 9,
-        fillColor: color,
-        fillOpacity: 1,
-        strokeColor: '#ffffff',
-        strokeWeight: 2,
-      };
-    } catch (e) {
-      return undefined;
-    }
-  };
 
   if (loading) return <div className="app"><p>Loading...</p></div>;
 
@@ -529,21 +505,18 @@ export default function App() {
   }
 
   return (
-    <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
+    <>
       <div className="app">
         <div className="map-area">
-        <GoogleMap mapContainerClassName="map" center={ABUJA_CENTER} zoom={13} onClick={handleMapClick} options={MAP_OPTIONS}>
-          {issues.map((issue) => (
-            <MarkerF
-              key={issue.id}
-              position={{ lat: issue.lat, lng: issue.lng }}
-              onClick={() => setSelected(issue)}
-              title={issue.title}
-              icon={getMarkerIcon(issue.category)}
-            />
-          ))}
-          {pendingLocation && <MarkerF position={pendingLocation} label="📍" />}
-        </GoogleMap>
+        <MapView
+          center={ABUJA_CENTER}
+          zoom={13}
+          issues={issues}
+          getColor={getPinColor}
+          onSelect={setSelected}
+          onMapClick={handleMapClick}
+          pendingLocation={pendingLocation}
+        />
           <div className="map-legend" aria-label="Map legend">
             {CATEGORIES.map((cat) => (
               <div key={cat.id} className="legend-item">
@@ -886,6 +859,6 @@ export default function App() {
           )}
         </div>
       </div>
-    </LoadScript>
+    </>
   );
 }
