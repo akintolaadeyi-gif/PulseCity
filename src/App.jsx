@@ -1,4 +1,5 @@
 import MapView from './MapView';
+import InstallButton from './InstallButton';
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
@@ -545,6 +546,8 @@ export default function App() {
               </button>
             </div>
           </div>
+
+          <InstallButton />
 
           {/* Notifications Dropdown */}
           {showNotifications && (userRole === 'admin' || userRole === 'staff') && (
