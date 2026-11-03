@@ -79,6 +79,7 @@ export default function MapView({ center, zoom, issues, getColor, onSelect, onMa
       center: [center.lng, center.lat],
       zoom,
       maxZoom: 18,
+      attributionControl: { compact: true },
     });
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
     map.on('click', (e) => {
