@@ -1,0 +1,42 @@
+name: Find homepage photo candidates
+# Temporary helper: searches Wikimedia Commons for freely licensed photos of
+# central Abuja and commits small previews + licence info to this branch.
+on:
+  push:
+    branches: [hero-candidates]
+    paths: [.github/workflows/hero-candidates.yml]
+permissions:
+  contents: write
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Search Commons
+        run: |
+          UA="PulseCity-homepage-build/1.0 (github.com/${{ github.repository }})"
+          mkdir -p candidates
+          : > candidates/list.tsv
+          i=0
+          for q in "Abuja skyline" "Abuja Central Business District" "Abuja city aerial" "Abuja city view" "Aso Rock Abuja city" "Abuja Millennium Tower" "Abuja National Mosque" "Abuja street" "Abuja city gate" "Abuja night"; do
+            curl -sSfG -A "$UA" https://commons.wikimedia.org/w/api.php \
+              --data-urlencode action=query --data-urlencode format=json \
+              --data-urlencode generator=search --data-urlencode "gsrsearch=$q filetype:bitmap" \
+              --data-urlencode gsrnamespace=6 --data-urlencode gsrlimit=8 \
+              --data-urlencode prop=imageinfo --data-urlencode "iiprop=url|size|extmetadata" \
+              --data-urlencode iiurlwidth=640 > r.json || continue
+            jq -r '.query.pages // {} | .[] | [.title, (.imageinfo[0].width|tostring), (.imageinfo[0].height|tostring), .imageinfo[0].extmetadata.LicenseShortName.value, (.imageinfo[0].extmetadata.Artist.value // "" | gsub("<[^>]*>";"") | gsub("\n";" ")), .imageinfo[0].thumburl] | @tsv' r.json | while IFS=$'\t' read -r t w h lic art th; do
+              [ "$w" -ge 1800 ] && [ "$w" -gt "$h" ] || continue
+              grep -qF "$t" candidates/list.tsv && continue
+              n=$(wc -l < candidates/list.tsv); n=$((n+1))
+              curl -sSfL -A "$UA" -o "candidates/$n.jpg" "$th" || continue
+              printf '%s\t%s\t%sx%s\t%s\t%s\n' "$n" "$t" "$w" "$h" "$lic" "$art" >> candidates/list.tsv
+              sleep 1
+            done
+          done
+          cat candidates/list.tsv
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add candidates && git commit -m "Photo candidates" && git push
