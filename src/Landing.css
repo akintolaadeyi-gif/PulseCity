@@ -328,7 +328,7 @@
   }
 
   .landing-shade {
-    background: linear-gradient(180deg, rgba(8, 36, 25, 0.55) 0%, rgba(8, 36, 25, 0.8) 45%, rgba(8, 36, 25, 0.95) 100%);
+    background: linear-gradient(180deg, rgba(8, 36, 25, 0.35) 0%, rgba(8, 36, 25, 0.7) 40%, rgba(8, 36, 25, 0.9) 100%);
   }
 
   .landing-bg img {
@@ -340,14 +340,14 @@
     margin-bottom: 22px;
   }
 
+  /* On phones the form matters most, so the three steps step aside. */
   .landing-steps {
-    grid-template-columns: 1fr;
-    gap: 8px;
+    display: none;
   }
 
-  .landing-steps li {
-    padding: 10px 12px;
-    align-items: center;
+  .landing h1 {
+    font-size: 34px;
+    max-width: none;
   }
 
   .landing-card {

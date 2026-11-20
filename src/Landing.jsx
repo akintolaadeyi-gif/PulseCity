@@ -1,8 +1,7 @@
 import '@fontsource-variable/bricolage-grotesque';
 import './Landing.css';
 
-// Background photo of central Abuja. Licence and author are shown in the corner
-// of the page; see public/hero/CREDIT.md for the full source.
+// Background photo of central Abuja; credit text lives in heroCredit.js.
 import { HERO_CREDIT } from './heroCredit';
 
 const STEPS = [
