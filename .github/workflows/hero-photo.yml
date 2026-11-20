@@ -1,0 +1,91 @@
+name: Fetch homepage photo
+
+# Downloads the homepage background photo from Wikimedia Commons, makes small
+# web-ready copies (WebP at 900/1600/2400 px wide, plus a JPEG fallback), and
+# commits them to public/hero/ with a CREDIT.md that records author and licence.
+# Run it from the Actions tab and paste the Commons file name, e.g.
+# "File:Some photo of Abuja.jpg".
+on:
+  workflow_dispatch:
+    inputs:
+      file:
+        description: 'Wikimedia Commons file name (starts with File:)'
+        required: true
+  push:
+    branches: [redesign-homepage]
+    paths: [.github/workflows/hero-photo.yml, public/hero/SOURCE]
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install image tools
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq webp imagemagick jq
+
+      - name: Look up the file on Commons
+        env:
+          INPUT_FILE: ${{ github.event.inputs.file }}
+        run: |
+          FILE="${INPUT_FILE:-$(cat public/hero/SOURCE)}"
+          echo "File: $FILE"
+          UA="PulseCity-homepage-build/1.0 (github.com/${{ github.repository }})"
+          curl -sSfG -A "$UA" "https://commons.wikimedia.org/w/api.php" \
+            --data-urlencode "action=query" --data-urlencode "format=json" \
+            --data-urlencode "prop=imageinfo" --data-urlencode "iiprop=url|extmetadata|size" \
+            --data-urlencode "iiurlwidth=2400" --data-urlencode "titles=$FILE" > info.json
+          jq '.query.pages[] | {title, imageinfo: [.imageinfo[0] | {width, height, thumburl, descriptionurl, lic: .extmetadata.LicenseShortName.value, licurl: .extmetadata.LicenseUrl.value, artist: .extmetadata.Artist.value}]}' info.json
+          echo "UA=$UA" >> "$GITHUB_ENV"
+
+      - name: Download and resize
+        run: |
+          mkdir -p public/hero
+          THUMB=$(jq -r '.query.pages[] | .imageinfo[0].thumburl' info.json)
+          curl -sSfL -A "$UA" -o original "$THUMB"
+          for w in 900 1600 2400; do
+            convert original -auto-orient -strip -resize "${w}x>" -quality 92 tmp.png
+            cwebp -quiet -q 72 tmp.png -o "public/hero/abuja-$w.webp"
+          done
+          convert original -auto-orient -strip -resize "1600x>" -quality 78 -interlace Plane public/hero/abuja-1600.jpg
+          rm -f original tmp.png
+          ls -lh public/hero
+
+      - name: Write credit files
+        run: |
+          P='.query.pages[] | .imageinfo[0]'
+          TITLE=$(jq -r '.query.pages[] | .title' info.json)
+          PAGE=$(jq -r "$P.descriptionurl" info.json)
+          LIC=$(jq -r "$P.extmetadata.LicenseShortName.value" info.json)
+          LICURL=$(jq -r "$P.extmetadata.LicenseUrl.value // \"$PAGE\"" info.json)
+          ARTIST=$(jq -r "$P.extmetadata.Artist.value" info.json | sed -e 's/<[^>]*>//g' | xargs)
+          echo "$TITLE" > public/hero/SOURCE
+          printf '# Homepage photo\n\n- File: %s\n- Page: %s\n- Author: %s\n- Licence: %s (%s)\n\nResized and converted to WebP/JPEG for the web. No other changes.\n' \
+            "$TITLE" "$PAGE" "$ARTIST" "$LIC" "$LICURL" > public/hero/CREDIT.md
+          cat public/hero/CREDIT.md
+          echo "AUTHOR=$ARTIST" >> "$GITHUB_ENV"; echo "LIC=$LIC" >> "$GITHUB_ENV"
+          echo "LICURL=$LICURL" >> "$GITHUB_ENV"; echo "PAGE=$PAGE" >> "$GITHUB_ENV"
+          # Keep the text shown in the page corner in step with the photo.
+          node -e '
+            const fs = require("fs");
+            const p = "src/heroCredit.js";
+            let s = fs.readFileSync(p, "utf8");
+            const set = (k, v) => { s = s.replace(new RegExp(`(${k}: )[^\\n]*`), `$1${JSON.stringify(v)},`); };
+            set("author", process.env.AUTHOR);
+            set("source", process.env.PAGE);
+            set("licence", process.env.LIC);
+            set("licenceUrl", process.env.LICURL);
+            fs.writeFileSync(p, s);'
+          cat src/heroCredit.js
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/hero src/heroCredit.js
+          git diff --cached --quiet && { echo "Nothing changed"; exit 0; }
+          git commit -m "Add homepage photo from Wikimedia Commons"
+          git push

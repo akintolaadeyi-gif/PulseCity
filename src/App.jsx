@@ -1,4 +1,5 @@
 import MapView from './MapView';
+import Landing from './Landing';
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
@@ -459,48 +460,17 @@ export default function App() {
 
   if (!user) {
     return (
-      <div className="auth-container">
-        <div className="auth-box">
-          <h1>PulseCity</h1>
-          <p>Report & track community issues</p>
-
-          <form onSubmit={handleAuth}>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <button type="submit">
-              {authMode === 'login' ? 'Login' : 'Sign Up'}
-            </button>
-          </form>
-
-          {authError && <p className="auth-error">{authError}</p>}
-
-          <p className="auth-toggle">
-            {authMode === 'login' ? "Don't have an account? " : 'Already have an account? '}
-            <button
-              type="button"
-              className="link-btn"
-              onClick={() => {
-                setAuthMode(authMode === 'login' ? 'signup' : 'login');
-                setAuthError('');
-              }}
-            >
-              {authMode === 'login' ? 'Sign Up' : 'Login'}
-            </button>
-          </p>
-        </div>
-      </div>
+      <Landing
+        authMode={authMode}
+        setAuthMode={setAuthMode}
+        email={email}
+        setEmail={setEmail}
+        password={password}
+        setPassword={setPassword}
+        authError={authError}
+        setAuthError={setAuthError}
+        onSubmit={handleAuth}
+      />
     );
   }
 
