@@ -1,0 +1,360 @@
+/* Sign-in homepage: full-screen photo of central Abuja with the form on top. */
+
+.landing {
+  --l-green: #0e3b2c;
+  --l-green-deep: #082419;
+  --l-amber: #f3b23a;
+  --l-amber-dark: #d9961c;
+  --l-ink: #10201a;
+  --l-muted: #5b6b64;
+  --l-line: #dfe5e1;
+  --l-head: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  color: #fff;
+  background: var(--l-green-deep);
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: light;
+}
+
+.landing-bg,
+.landing-bg img {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.landing-bg img {
+  object-fit: cover;
+  object-position: center 40%;
+}
+
+.landing-shade {
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(100deg, rgba(8, 36, 25, 0.92) 0%, rgba(8, 36, 25, 0.72) 42%, rgba(8, 36, 25, 0.25) 75%, rgba(8, 36, 25, 0.35) 100%),
+    linear-gradient(0deg, rgba(8, 36, 25, 0.7) 0%, rgba(8, 36, 25, 0) 35%);
+}
+
+.landing-top,
+.landing-main,
+.landing-credit {
+  position: relative;
+  z-index: 1;
+}
+
+.landing-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px clamp(16px, 5vw, 64px);
+}
+
+.landing-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--l-head);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.3px;
+}
+
+.landing-pulse {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--l-amber);
+}
+
+.landing-pulse::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--l-amber);
+  opacity: 0;
+  animation: landing-ping 2.4s ease-out infinite;
+}
+
+@keyframes landing-ping {
+  0% { transform: scale(0.5); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-pulse::after { animation: none; }
+}
+
+.landing-place {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(8, 36, 25, 0.35);
+}
+
+.landing-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 400px);
+  gap: clamp(32px, 6vw, 96px);
+  align-items: center;
+  padding: 24px clamp(16px, 5vw, 64px) 48px;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.landing-eyebrow {
+  margin: 0 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--l-amber);
+}
+
+.landing h1 {
+  margin: 0 0 18px;
+  font-family: var(--l-head);
+  font-weight: 700;
+  font-size: clamp(36px, 5.2vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: #fff;
+  max-width: 13ch;
+}
+
+.landing h1 span {
+  color: var(--l-amber);
+}
+
+.landing-lead {
+  margin: 0 0 32px;
+  max-width: 46ch;
+  font-size: 18px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.landing-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 640px;
+}
+
+.landing-steps li {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(8, 36, 25, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(6px);
+}
+
+.landing-step-n {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--l-amber);
+  color: var(--l-green-deep);
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.landing-steps strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.landing-steps p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Sign-in card */
+.landing-card {
+  background: #fff;
+  color: var(--l-ink);
+  border-radius: 20px;
+  padding: 32px 28px 24px;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.55);
+}
+
+.landing-card h2 {
+  margin: 0 0 6px;
+  font-family: var(--l-head);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--l-ink);
+}
+
+.landing-card-sub {
+  margin: 0 0 22px;
+  font-size: 15px;
+  color: var(--l-muted);
+}
+
+.landing-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.landing-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--l-ink);
+}
+
+.landing-card input {
+  font: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  padding: 12px 14px;
+  border: 1px solid var(--l-line);
+  border-radius: 10px;
+  background: #f7f9f8;
+  color: var(--l-ink);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.landing-card input:focus {
+  outline: none;
+  border-color: var(--l-green);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(14, 59, 44, 0.15);
+}
+
+.landing .landing-submit {
+  margin: 6px 0 0;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--l-green);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.landing .landing-submit:hover {
+  background: var(--l-green-deep);
+}
+
+.landing-error {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fff6e5;
+  color: #7a4b00;
+  font-size: 14px;
+}
+
+.landing-switch {
+  margin: 18px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--l-line);
+  font-size: 14px;
+  color: var(--l-muted);
+  text-align: center;
+}
+
+.landing-switch button {
+  width: auto;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--l-green);
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.landing-switch button:hover {
+  background: none;
+  color: var(--l-amber-dark);
+}
+
+.landing-credit {
+  padding: 0 clamp(16px, 5vw, 64px) 16px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: right;
+}
+
+.landing-credit a {
+  color: inherit;
+}
+
+/* Tablet and phone: stack copy above the card */
+@media (max-width: 860px) {
+  .landing-main {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 28px;
+    padding-top: 8px;
+  }
+
+  .landing-shade {
+    background: linear-gradient(180deg, rgba(8, 36, 25, 0.35) 0%, rgba(8, 36, 25, 0.7) 40%, rgba(8, 36, 25, 0.9) 100%);
+  }
+
+  .landing-bg img {
+    object-position: 60% 30%;
+  }
+
+  .landing-lead {
+    font-size: 16px;
+    margin-bottom: 22px;
+  }
+
+  /* On phones the form matters most, so the three steps step aside. */
+  .landing-steps {
+    display: none;
+  }
+
+  .landing h1 {
+    font-size: 34px;
+    max-width: none;
+  }
+
+  .landing-card {
+    padding: 24px 20px 20px;
+  }
+
+  .landing-credit {
+    text-align: left;
+  }
+}
